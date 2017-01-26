@@ -28,10 +28,13 @@ export class PartiesFormComponent implements OnInit {
   }
 
   addParty(): void {
-    if (this.addForm.valid) {
-      Parties.insert(this.addForm.value);
+    if (!Meteor.userId()) {
+      alert('Please log in to add a party');
+      return;
+    }
 
-      this.addForm.reset();
+    if (this.addForm.valid) {
+      Parties.insert(Object.assign({}, this.addForm.value, { owner: Meteor.userId() }));
     }
   }
 

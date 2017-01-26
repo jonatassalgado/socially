@@ -1,6 +1,9 @@
+// import { Subscription } from 'rxjs/Rx';
 // Modules
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+import { MeteorObservable } from 'meteor-rxjs';
 
 // Collections
 import { Parties } from '../../../../both/collections/parties.collection';
@@ -17,14 +20,20 @@ import template from './parties-list.component.html';
   template: template
 })
 
-export class PartiesListComponent {
+export class PartiesListComponent implements OnInit, OnDestroy {
   parties: Observable<Party[]>;
+  partiesSub: Subscription;
 
-  constructor(){
+  ngOnInit() {
     this.parties = Parties.find({}).zone();
+    this.partiesSub = MeteorObservable.subscribe('parties').subscribe();
   }
 
   removeParty(party: Party): void {
     Parties.remove(party._id);
+  }
+
+  ngOnDestroy() {
+    this.partiesSub.unsubscribe();
   }
 }
